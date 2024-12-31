@@ -50,8 +50,18 @@ class MainInterface(ctk.CTk):
             
             draw_windows_frame()
 
+        def update_option_menus():
+            selected_windows = [svar.get() for svar, _ in self.displays_selection.values()]
+            filtered_windows = [title for title in self.active_windows_titles if title not in selected_windows]
+
+            for svar, menu in self.displays_selection.values():
+                menu: ctk.CTkOptionMenu
+                svar: ctk.StringVar
+                current_value = svar.get()
+                menu.configure(values=filtered_windows + [current_value])
+
         # Set the currently selected windows as safe windows TODO
-        def select_windows():
+        def set_windows():
             pass
         
         # Draw the window frame
@@ -71,6 +81,7 @@ class MainInterface(ctk.CTk):
                 label = ctk.CTkLabel(menu_frame, text=pretty_name)
                 svar = ctk.StringVar(value=name)
                 menu = ctk.CTkOptionMenu(menu_frame, values=self.active_windows_titles, variable=svar)
+                svar.trace_add('write', lambda *_: update_option_menus())
                 self.displays_selection[name] = (svar, menu)
 
                 label.grid(row=0, column=0, padx=5, pady=5)
@@ -82,7 +93,7 @@ class MainInterface(ctk.CTk):
             button_frame.grid_rowconfigure((0, 1), weight=1)
             update_button = ctk.CTkButton(button_frame, text='Clear & update', command=update_windows_frame)
             update_button.grid(row=0, column=0, padx=5, pady=5)
-            select_button = ctk.CTkButton(button_frame, text='Select', command=select_windows)
+            select_button = ctk.CTkButton(button_frame, text='Select', command=set_windows)
             select_button.grid(row=1, column=0, padx=5, pady=5)
             button_frame.grid(row=0, column=n_displays, sticky='nsew', padx=5, pady=5)
 
@@ -98,6 +109,14 @@ class MainInterface(ctk.CTk):
         # Functions
         # Retrieve the previous user defined keybinds TODO
         def get_previous_keybinds():
+            return ["ctrl+alt+h"]
+        
+        # Set the listener to the new keybind setting TODO
+        def set_keybind():
+            pass
+        
+        # Capture keyboard to create new keybind setting TODO
+        def capture_keybind():
             pass
 
         # Draw the keybind frame
@@ -112,13 +131,26 @@ class MainInterface(ctk.CTk):
 
             label = ctk.CTkLabel(menu_frame, text='KEYBIND')
             svar = ctk.StringVar(value='KEYBIND')
+            menu = ctk.CTkOptionMenu(menu_frame, values=get_previous_keybinds(), variable=svar)
 
+            label.grid(row=0, column=0, padx=5, pady=5)
+            menu.grid(row=1, column=0, padx=5, pady=5)
 
             button_frame = ctk.CTkFrame(self.keybind_frame)
             button_frame.grid_columnconfigure(0, weight=1)
-            button_frame.grid_rowconfigure((0, 1), weight=1)
+            button_frame.grid_rowconfigure((0, 1, 2), weight=1)
 
+            # TODO
+            clear_button = ctk.CTkButton(button_frame, text='Clear', command=lambda: svar.set('KEYBIND'))
+            set_button = ctk.CTkButton(button_frame, text='Set', command=lambda: set_keybind())
+            capture_button = ctk.CTkButton(button_frame, text='Capture keybind', command=lambda: capture_keybind())
 
+            clear_button.grid(row=0, column=0, padx=5, pady=5)
+            set_button.grid(row=1, column=0, padx=5, pady=5)
+            capture_button.grid(row=2, column=0, padx=5, pady=5)
+
+            menu_frame.grid(row=0, column=0, sticky='nsew', padx=5, pady=5)
+            button_frame.grid(row=0, column=1, sticky='nsew', padx=5, pady=5)
             
 
 
@@ -127,9 +159,24 @@ class MainInterface(ctk.CTk):
         # ===================== #
 
         # Variables
+        self.start_stop_button = None
 
 
         # Functions
+        # Toggle the safe mode on and off TODO
+        def toggle_safe_mode():
+            self.start_stop_button.configure(text='Stop' if self.start_stop_button.cget('text') == 'Start' else 'Start')
+            
+
+        def draw_console_frame():
+            self.console_frame.grid_rowconfigure(0, weight=1)
+            self.console_frame.grid_columnconfigure((0, 1), weight=1)
+
+            self.start_stop_button = ctk.CTkButton(self.console_frame, text='Start', command=toggle_safe_mode)
+            settings_button = ctk.CTkButton(self.console_frame, text='Settings', command=lambda: None) # TODO
+
+            self.start_stop_button.grid(row=0, column=0, padx=5, pady=5)
+            settings_button.grid(row=0, column=1, padx=5, pady=5)
 
 
         # =================== #
@@ -147,19 +194,13 @@ class MainInterface(ctk.CTk):
 
 
         # Keybind Frame
-        self.keybind_frame.grid_rowconfigure(0, weight=1)
-        self.keybind_frame.grid_columnconfigure(0, weight=2)
-        self.keybind_frame.grid_columnconfigure(1, weight=1)
-
-        button_frame = ctk.CTkFrame(self.keybind_frame)
-        button_frame.grid_columnconfigure(0, weight=1)
-        button_frame.grid_rowconfigure((0, 1), weight=1)
+        draw_keybind_frame()
+        self.keybind_frame.grid(row=1, column=0, sticky='nsew', padx=5, pady=5)
 
 
-
-        
-
-
+        # Console Frame
+        draw_console_frame()
+        self.console_frame.grid(row=2, column=0, sticky='nsew', padx=5, pady=(30, 5))
 
 
 
