@@ -201,10 +201,3 @@ class MainInterface(ctk.CTk):
         # Console Frame
         draw_console_frame()
         self.console_frame.grid(row=2, column=0, sticky='nsew', padx=5, pady=(30, 5))
-
-
-
-
-if __name__ == '__main__':
-    interface = MainInterface()
-    interface.mainloop()
