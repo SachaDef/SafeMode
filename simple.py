@@ -68,12 +68,14 @@ if __name__ == "__main__":
     print("Press F9 to reselect target window (FIFO queue if multiple displays).")
     print("Press F10 to exit.\n")
 
-    for hwnd, title in get_active_windows():
-        if "ganymede" in title.lower().replace("è", "e"):
-            # Remove top-most attribute
-            flags = SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE
-            SetWindowPos(hwnd, HWND_NOTOPMOST, 0, 0, 0, 0, flags)
-            print(f"Removed top-most property from window: {title} ({hwnd})")
+    user = input("Should Ganymede windows be unpinned from top-most? (y/n): ")
+    if user.lower() == 'y':
+        for hwnd, title in get_active_windows():
+            if "ganymede" in title.lower().replace("è", "e"):
+                # Remove top-most attribute
+                flags = SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE
+                SetWindowPos(hwnd, HWND_NOTOPMOST, 0, 0, 0, 0, flags)
+                print(f"Removed top-most property from window: {title} ({hwnd})")
     print("")
 
     CODE_HWND = GetForegroundWindow()
